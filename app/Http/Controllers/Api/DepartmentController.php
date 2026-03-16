@@ -13,7 +13,11 @@ class DepartmentController extends Controller
 {
     public function index()
     {
-        return DepartmentResource::collection(Department::orderBy('name', 'asc')->get());
+        $departments = Department::where('estado', true)
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return DepartmentResource::collection($departments);
     }
 
     public function store(StoreDepartmentRequest $request): JsonResponse
@@ -27,6 +31,10 @@ class DepartmentController extends Controller
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
         }
+    }
+    public function show(Department $department): DepartmentResource
+    {
+        return new DepartmentResource($department);
     }
 
     public function update(UpdateDepartmentRequest $request, $id): JsonResponse
@@ -43,21 +51,14 @@ class DepartmentController extends Controller
         }
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy(Department $department): JsonResponse
     {
         try {
-            $department = Department::findOrFail($id);
-
-            // Restricción: No borrar si el departamento está en el catálogo de asignaciones
-            if ($department->assignments()->exists()) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'No se puede eliminar: Este departamento tiene cargos asignados.'
-                ], 400);
-            }
-
-            $department->delete();
-            return response()->json(['status' => 'success', 'message' => 'Departamento eliminado']);
+            $department->update(['estado' => false]);
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Departamento desactivado correctamente'
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
         }

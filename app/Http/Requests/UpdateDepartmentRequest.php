@@ -12,11 +12,8 @@ class UpdateDepartmentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        /**
-         * Usamos el operador null-safe (?->) para evitar errores si el usuario es nulo.
-         * Esto verifica si el usuario existe y si tiene el rol de administrador.
-         */
-        return $this->user()?->isAdmin() ?? false;
+        $user = $this->user();
+        return $user?->isAdmin() ?? false;
     }
 
     /**
@@ -27,7 +24,8 @@ class UpdateDepartmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:departments,name,' . $this->route('department'),
+            'name'   => 'required|string|max:255|unique:departments,name,' . $this->route('department'),
+            'estado' => 'required|boolean',
         ];
     }
 }

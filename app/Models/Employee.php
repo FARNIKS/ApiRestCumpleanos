@@ -11,18 +11,35 @@ class Employee extends Model
     protected $table = 'employees';
     public $timestamps = false;
 
-    protected $fillable = ['name', 'birthday', 'branch_id', 'assignments_id', 'estado'];
+    protected $fillable = ['name', 'birthday', 'branch_id', 'assignment_id', 'estado'];
 
     protected $casts = [
         'estado'   => 'boolean',
         'birthday' => 'date',
     ];
 
-    /**
-     * Eventos de Modelo: Lógica de negocio automatizada.
-     */
-    // app/Models/Employee.php
+    /* --- RELACIONES --- */
 
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
+
+    public function assignment(): BelongsTo
+    {
+        return $this->belongsTo(Assignment::class, 'assignment_id');
+    }
+
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            // Al obtenerlo: "RECURSOS HUMANOS" -> "Recursos Humanos"
+            get: fn(string $value) => mb_convert_case($value, MB_CASE_TITLE, "UTF-8"),
+
+            // Al guardarlo: "recursos humanos" -> "RECURSOS HUMANOS"
+            set: fn(string $value) => mb_strtoupper($value, "UTF-8"),
+        );
+    }
     protected static function booted()
     {
         static::created(fn($employee) => $employee->branch()->increment('total_staff'));
@@ -37,28 +54,5 @@ class Employee extends Model
                 }
             }
         });
-    }
-
-    /* --- RELACIONES --- */
-
-    public function branch(): BelongsTo
-    {
-        return $this->belongsTo(Branch::class, 'branch_id');
-    }
-
-    public function assignment(): BelongsTo
-    {
-        return $this->belongsTo(Assignment::class, 'assignments_id');
-    }
-
-    protected function name(): Attribute
-    {
-        return Attribute::make(
-            // Al obtenerlo: "RECURSOS HUMANOS" -> "Recursos Humanos"
-            get: fn(string $value) => mb_convert_case($value, MB_CASE_TITLE, "UTF-8"),
-
-            // Al guardarlo: "recursos humanos" -> "RECURSOS HUMANOS"
-            set: fn(string $value) => mb_strtoupper($value, "UTF-8"),
-        );
     }
 }

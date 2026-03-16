@@ -15,6 +15,8 @@ class EmployeeController extends Controller
     {
         // Eager loading para evitar consultas N+1
         $employees = Employee::with(['branch.company', 'assignment.position', 'assignment.department'])
+            ->where('estado', 1) // Solo empleados activos
+            ->orderBy('name', 'asc')
             ->paginate(15);
 
         return EmployeeResource::collection($employees);
@@ -35,6 +37,12 @@ class EmployeeController extends Controller
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
         }
+    }
+    public function show(Employee $employee): EmployeeResource
+    {
+        $employee->load(['branch.company', 'assignment.position', 'assignment.department']);
+
+        return new EmployeeResource($employee);
     }
 
     public function update(UpdateEmployeeRequest $request, Employee $employee): JsonResponse

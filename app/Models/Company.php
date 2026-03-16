@@ -9,9 +9,18 @@ class Company extends Model
 {
     protected $table = 'companies';
 
-    protected $fillable = ['name'];
-    // Importante: Laravel no intentará insertar fechas de creación/edición
     public $timestamps = false;
+
+    protected $fillable = [
+        'name',
+        'estado'
+    ];
+
+    protected $casts = [
+        'estado'   => 'boolean'
+    ];
+
+
 
     public function branches()
     {

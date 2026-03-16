@@ -14,11 +14,8 @@ class UpdateAssignmentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        /**
-         * Usamos el operador null-safe (?->) para evitar errores si el usuario es nulo.
-         * Esto verifica si el usuario existe y si tiene el rol de administrador.
-         */
-        return $this->user()?->isAdmin() ?? false;
+        $user = $this->user();
+        return $user?->isAdmin() ?? false;
     }
 
     /**
@@ -28,34 +25,21 @@ class UpdateAssignmentRequest extends FormRequest
      */
     public function rules(): array
     {
-        // Captura el ID de la ruta independientemente de cómo se llame el parámetro
         $assignmentId = $this->route('assignment') ?? $this->route('id');
 
         return [
-            'departments_id' => [
+            'department_id' => [
                 'required',
-                'exists:departments,id',
-                // Regla Única Compuesta: Verifica que la pareja Dept/Cargo no se repita
-                Rule::unique('assignments', 'departments_id')
+                'exists:departments,id', // CORRECCIÓN: Tabla departments (plural)
+                Rule::unique('assignments', 'department_id')
                     ->where(function ($query) {
-                        return $query->where('positions_id', $this->positions_id);
+                        // CORRECCIÓN: position_id (singular)
+                        return $query->where('position_id', $this->position_id);
                     })
-                    ->ignore($assignmentId), // Ignora el registro actual para permitir "guardar sin cambios"
+                    ->ignore($assignmentId),
             ],
-            'positions_id' => [
-                'required',
-                'exists:positions,id',
-            ],
-        ];
-    }
-
-    /**
-     * Mensajes personalizados para que Postman se vea profesional
-     */
-    public function messages(): array
-    {
-        return [
-            'departments_id.unique' => 'Esta combinación de Departamento y Cargo ya existe en el catálogo.',
+            'position_id' => 'required|exists:positions,id',
+            'estado' => 'sometimes|boolean',
         ];
     }
 }

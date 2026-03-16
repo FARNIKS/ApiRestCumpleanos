@@ -14,7 +14,7 @@ class PositionController extends Controller
     public function index()
     {
         // Recupera los cargos y cuenta sus vínculos en una sola consulta SQL
-        $positions = Position::withCount('assignments')
+        $positions = Position::where('estado', true)
             ->orderBy('name', 'asc')
             ->get();
 
@@ -34,6 +34,12 @@ class PositionController extends Controller
         }
     }
 
+    public function show(Position $position): PositionResource
+    {
+
+        return new PositionResource($position);
+    }
+
     public function update(UpdatePositionRequest $request, $id): JsonResponse
     {
         try {
@@ -48,21 +54,15 @@ class PositionController extends Controller
         }
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy(Position $position): JsonResponse
     {
         try {
-            $position = Position::findOrFail($id);
+            $position->update(['estado' => false]);
 
-            // Restricción: No borrar si el cargo existe en alguna combinación de la tabla assignments
-            if ($position->assignments()->exists()) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'No se puede eliminar: Este cargo está siendo usado en el catálogo.'
-                ], 400);
-            }
-
-            $position->delete();
-            return response()->json(['status' => 'success', 'message' => 'Cargo eliminado correctamente']);
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Empleado desactivado y personal de sucursal actualizado'
+            ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
         }

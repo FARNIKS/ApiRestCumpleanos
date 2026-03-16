@@ -1,26 +1,40 @@
 <?php
 
-use App\Models\Branch;
-use App\Models\Assignment;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+
 
 Route::get('/', function () {
-    // 1. Cargamos sucursales agrupadas
-    $branches = Branch::with('company')->get()
-        ->groupBy(fn($b) => $b->company->name ?? 'Sin Empresa')
-        ->map(fn($items, $comp) => [
-            'label' => $comp,
-            'options' => $items->map(fn($i) => ['value' => $i->id, 'text' => $i->name])
-        ]);
+    return view('welcome');
+});
 
-    // 2. Cargamos asignaciones agrupadas
-    $assignments = Assignment::with(['position', 'department'])->get()
-        ->groupBy(fn($asig) => $asig->department->name ?? 'Sin Departamento')
-        ->map(fn($items, $dept) => [
-            'label' => $dept,
-            'options' => $items->map(fn($item) => ['value' => $item->id, 'text' => $item->position->name])
-        ]);
+Route::get('/setup', function () {
+    $credentials = [
+        'email' => "admin@admin.com",
+        'password' => "password"
+    ];
 
-    // 3. PASAR LAS VARIABLES A LA VISTA (Esto es lo que falta)
-    return view('welcome', compact('branches', 'assignments'));
+    if (!Auth::attempt($credentials)) {
+
+        $user = new User();
+        $user->name = "Admin";
+        $user->email = $credentials['email'];
+        $user->password = Hash::make($credentials['password']);
+        $user->role = 'admin';
+        $user->save();
+    }
+    if (Auth::attempt($credentials)) {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $adminToken = $user->createToken('admin-token', ['create', 'update', 'delete']);
+        $updateToken = $user->createToken('update-token', ['create', 'update']);
+        $basicToken = $user->createToken('basic-token');
+        return [
+            'adminToken' => $adminToken->plainTextToken,
+            'updateToken' => $updateToken->plainTextToken,
+            'basicToken' => $basicToken->plainTextToken,
+        ];
+    };
 });

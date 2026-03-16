@@ -9,14 +9,22 @@ class Position extends Model
 {
     protected $table = 'positions';
 
-    protected $fillable = ['name'];
-    // Añade esta línea:
     public $timestamps = false;
+
+    protected $fillable = [
+        'name',
+        'estado'
+    ];
+
+    protected $casts = [
+        'estado'   => 'boolean'
+    ];
+
 
     public function assignments()
     {
         // Añadimos 'positions_id' para que Laravel no busque 'position_id'
-        return $this->hasMany(Assignment::class, 'positions_id');
+        return $this->hasMany(Assignment::class, 'position_id');
     }
     protected function name(): Attribute
     {

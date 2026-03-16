@@ -10,18 +10,24 @@ class Assignment extends Model
 {
     protected $table = 'assignments';
 
-    // Añade esta línea:
     public $timestamps = false;
 
-    protected $fillable = ['positions_id', 'departments_id'];
+    protected $fillable = [
+        'position_id',
+        'department_id',
+        'estado'
+    ];
+    protected $casts = [
+        'estado'   => 'boolean'
+    ];
 
     public function position(): BelongsTo
     {
-        return $this->belongsTo(Position::class, 'positions_id');
+        return $this->belongsTo(Position::class, 'position_id');
     }
 
     public function department(): BelongsTo
     {
-        return $this->belongsTo(Department::class, 'departments_id');
+        return $this->belongsTo(Department::class, 'department_id');
     }
 }

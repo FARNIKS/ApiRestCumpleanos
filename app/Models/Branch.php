@@ -10,10 +10,20 @@ class Branch extends Model
 {
     protected $table = 'branches';
 
-    protected $fillable = ['code', 'country', 'total_staff', 'company_id'];
-
-    // Añade esta línea:
     public $timestamps = false;
+
+    protected $fillable = [
+        'code',
+        'country',
+        'total_staff',
+        'company_id',
+        'estado'
+    ];
+
+    protected $casts = [
+        'estado'   => 'boolean'
+    ];
+
 
     public function company(): BelongsTo
     {

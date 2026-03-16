@@ -12,11 +12,8 @@ class StoreCompanyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        /**
-         * Usamos el operador null-safe (?->) para evitar errores si el usuario es nulo.
-         * Esto verifica si el usuario existe y si tiene el rol de administrador.
-         */
-        return $this->user()?->isAdmin() ?? false;
+        $user = $this->user();
+        return $user?->isAdmin() ?? false;
     }
 
     /**
@@ -28,6 +25,7 @@ class StoreCompanyRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255|unique:companies,name,',
+            'estado' => 'required|boolean',
         ];
     }
 }

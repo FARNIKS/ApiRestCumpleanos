@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Assignment;
 use App\Http\Requests\StoreAssignmentRequest;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\UpdateAssignmentRequest;
 use App\Http\Resources\AssignmentResource;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 
 class AssignmentController extends Controller
@@ -14,14 +15,15 @@ class AssignmentController extends Controller
     public function index()
     {
         $assignments = Assignment::with(['position', 'department'])
-            ->join('departments', 'assignments.departments_id', '=', 'departments.id')
-            ->join('positions', 'assignments.positions_id', '=', 'positions.id')
+            ->join('departments', 'assignments.department_id', '=', 'departments.id')
+            ->join('positions', 'assignments.position_id', '=', 'positions.id')
+            // FILTRO: Solo traer los registros donde estado sea 1 (true)
+            ->where('assignments.estado', 1)
             ->orderBy('departments.name')
             ->select('assignments.*')
             ->get();
 
-        // Agrupamos por departamento para el Frontend (Select grouped options)
-        $grouped = $assignments->groupBy(fn($asig) => $asig->department->name);
+        $grouped = $assignments->groupBy(fn($asig) => $asig->department?->name ?? 'Sin Departamento');
 
         return response()->json(
             $grouped->map(fn($items, $dept) => [
@@ -34,35 +36,85 @@ class AssignmentController extends Controller
     public function store(StoreAssignmentRequest $request): JsonResponse
     {
         try {
-            // Envolvemos en una transacción para que SQL Server mantenga la consistencia [4]
             return DB::transaction(function () use ($request) {
-
-                // 1. Lógica de "Encontrar o Crear": 
-                // Si la pareja ya existe, la recupera; si no, la crea en un solo paso.
-                // Esto elimina la dependencia manual de verificar el ID antes de insertar.
-                $assignment = Assignment::firstOrCreate(
+                // Si ya existe uno desactivado con esa dupla, lo reactiva o crea uno nuevo
+                $assignment = Assignment::updateOrCreate(
                     [
-                        'departments_id' => $request->departments_id,
-                        'positions_id'   => $request->positions_id,
-                    ]
+                        'department_id' => $request->department_id,
+                        'position_id'   => $request->position_id,
+                    ],
+                    ['estado' => true]
                 );
 
-                // 2. Carga de relaciones para la respuesta JSON
-                // Aprovechamos el Eager Loading para obtener nombres formateados (Título) [5]
                 $assignment->load(['department', 'position']);
 
-                // 3. Respuesta estandarizada para el frontend de React [6, 7]
                 return response()->json([
                     'status'  => 'success',
-                    'message' => 'Vínculo de catálogo procesado correctamente',
+                    'message' => 'Vínculo procesado y activado correctamente',
                     'data'    => new AssignmentResource($assignment)
-                ], 201); // Código 201: Recurso creado exitosamente [8]
+                ], 201);
             });
         } catch (\Exception $e) {
-            // Captura errores técnicos de SQL Server (ej. caídas de conexión) [9]
             return response()->json([
                 'status'  => 'error',
-                'message' => 'No se pudo procesar la asignación en el catálogo central',
+                'message' => 'Error al procesar la asignación',
+                'info'    => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function show(Assignment $assignment): AssignmentResource
+    {
+        // Cargamos relaciones para que el Resource tenga los nombres de Depto y Puesto
+        return new AssignmentResource($assignment->load(['position', 'department']));
+    }
+
+    public function update(UpdateAssignmentRequest $request, Assignment $assignment): JsonResponse
+    {
+        try {
+            // Usamos una transacción para asegurar que los cambios se guarden correctamente en SQL Server
+            return DB::transaction(function () use ($request, $assignment) {
+
+                // Actualizamos los campos. 
+                // Gracias a que usamos singular (department_id, position_id), coinciden con el SQL
+                $assignment->update([
+                    'department_id' => $request->department_id,
+                    'position_id'   => $request->position_id,
+                    'estado'        => $request->estado ?? $assignment->estado,
+                ]);
+
+                // Recargamos las relaciones para que la respuesta de Postman muestre los nombres actualizados
+                $assignment->load(['department', 'position']);
+
+                return response()->json([
+                    'status'  => 'success',
+                    'message' => 'Vínculo de catálogo actualizado correctamente',
+                    'data'    => new AssignmentResource($assignment)
+                ], 200);
+            });
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'No se pudo actualizar la asignación',
+                'info'    => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function destroy(Assignment $assignment): JsonResponse
+    {
+        try {
+            // Borrado lógico: cambiamos estado a 0
+            $assignment->update(['estado' => false]);
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Asignación desactivada del catálogo correctamente'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'No se pudo desactivar la asignación',
                 'info'    => $e->getMessage()
             ], 500);
         }

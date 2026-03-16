@@ -15,24 +15,21 @@ class EmployeeResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'         => $this->id,
-            'fullName'   => $this->name,
-            'birthday'   => $this->birthday?->format('Y-m-d'), // Protección en la fecha
-            'isActive'   => $this->estado,
+            'id'        => $this->id,
+            'fullName'  => $this->name,
+            'birthday'  => $this->birthday?->format('Y-m-d'),
+            'isActive'  => $this->estado,
 
-            'assignment' => [
+            'assignment' => $this->when($this->assignment, [
                 'position'   => $this->assignment?->position?->name ?? 'No Position',
                 'department' => $this->assignment?->department?->name ?? 'General',
-            ],
+            ]),
 
-            // Protección en relaciones de un nivel
-            'branch' => [
-                'name'   => $this->branch?->code,
+            'branch' => $this->when($this->branch, [
+                'code'    => $this->branch?->code,
                 'country' => $this->branch?->country,
-                'company' => $this->branch?->company?->name,
-            ],
-
-
+                'company' => $this->branch?->company?->name ?? 'No Company',
+            ]),
         ];
     }
 }

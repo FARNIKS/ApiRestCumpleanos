@@ -13,7 +13,12 @@ class BranchController extends Controller
 {
     public function index()
     {
-        return BranchResource::collection(Branch::with('company')->get());
+        $branches = Branch::with('company')
+            ->where('estado', true)
+            ->orderBy('code', 'asc')
+            ->get();
+
+        return BranchResource::collection($branches);
     }
 
     public function store(StoreBranchRequest $request): JsonResponse
@@ -24,6 +29,11 @@ class BranchController extends Controller
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
         }
+    }
+
+    public function show(Branch $branch): BranchResource
+    {
+        return new BranchResource($branch);
     }
 
     public function update(UpdateBranchRequest $request, $id): JsonResponse
@@ -52,17 +62,17 @@ class BranchController extends Controller
         }
     }
 
-    public function destroy($id): JsonResponse
+
+    public function destroy(Branch $branch): JsonResponse
     {
         try {
-            $branch = Branch::findOrFail($id);
-            if ($branch->employees()->exists()) {
-                return response()->json(['status' => 'error', 'message' => 'No se puede eliminar: sucursal con personal'], 400);
-            }
-            $branch->delete();
-            return response()->json(['status' => 'success', 'message' => 'Sede eliminada']);
+            $branch->update(['estado' => false]);
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Departamento desactivado correctamente'
+            ], 200);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
         }
     }
 }

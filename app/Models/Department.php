@@ -9,15 +9,20 @@ class Department extends Model
 {
     protected $table = 'departments';
 
-    protected $fillable = ['name'];
-
-    // Añade esta línea:
     public $timestamps = false;
+
+    protected $fillable = [
+        'name',
+        'estado'
+    ];
+
+    protected $casts = [
+        'estado'   => 'boolean'
+    ];
 
     public function assignments()
     {
-        // Asegúrate de poner 'departments_id' (con la 's')
-        return $this->hasMany(Assignment::class, 'departments_id');
+        return $this->hasMany(Assignment::class, 'department_id');
     }
 
     protected function name(): Attribute

@@ -17,11 +17,8 @@ class StoreBranchRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        /**
-         * Usamos el operador null-safe (?->) para evitar errores si el usuario es nulo.
-         * Esto verifica si el usuario existe y si tiene el rol de administrador.
-         */
-        return $this->user()?->isAdmin() ?? false;
+        $user = $this->user();
+        return $user?->isAdmin() ?? false;
     }
 
     /**
@@ -36,6 +33,7 @@ class StoreBranchRequest extends FormRequest
             'company_id' => 'required|exists:companies,id',
             'country'    => 'required|string|max:255',
             'total_staff' => 'required|integer',
+            'estado' => 'required|boolean',
         ];
     }
 }

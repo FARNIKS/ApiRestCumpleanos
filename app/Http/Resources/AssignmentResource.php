@@ -15,11 +15,13 @@ class AssignmentResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'departamento' => $this->department->name ?? 'N/A',
-            'cargo' => $this->position->name ?? 'N/A',
-            'depto_id' => $this->departments_id,
-            'cargo_id' => $this->positions_id,
+            'id'             => $this->id,
+            'departmentName' => $this->department?->name ?? 'N/A',
+            'positionName'   => $this->position?->name ?? 'N/A',
+            // CORRECCIÓN: Nombres en singular
+            'departmentId'   => $this->department_id,
+            'positionId'     => $this->position_id,
+            'isActive'       => $this->estado,
         ];
     }
 }

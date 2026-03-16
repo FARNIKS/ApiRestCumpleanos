@@ -13,7 +13,11 @@ class CompanyController extends Controller
 {
     public function index()
     {
-        return CompanyResource::collection(Company::orderBy('name', 'asc')->get());
+        $company = Company::where('estado', true)
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return CompanyResource::collection($company);
     }
 
     public function store(StoreCompanyRequest $request): JsonResponse
@@ -28,13 +32,18 @@ class CompanyController extends Controller
             return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
         }
     }
+    public function show(Company $company): CompanyResource
+    {
+        return new CompanyResource($company);
+    }
 
 
-    public function update(UpdateCompanyRequest $request, $id): JsonResponse
+    public function update(UpdateCompanyRequest $request, Company $company): JsonResponse
     {
         try {
-            $company = Company::findOrFail($id);
+            // Al usar el Binding (Company $company), Laravel ya hace el findOrFail automáticamente
             $company->update($request->validated());
+
             return response()->json([
                 'status' => 'success',
                 'data'   => new CompanyResource($company)
@@ -44,21 +53,15 @@ class CompanyController extends Controller
         }
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy(Company $company): JsonResponse
     {
         try {
-            $company = Company::findOrFail($id);
-
-            // Restricción: No borrar si la empresa tiene sucursales registradas
-            if ($company->branches()->exists()) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'No se puede eliminar: La empresa tiene sucursales vinculadas.'
-                ], 400);
-            }
-
-            $company->delete();
-            return response()->json(['status' => 'success', 'message' => 'Empresa eliminada correctamente']);
+            // Borrado lógico
+            $company->update(['estado' => false]);
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Empresa desactivada correctamente' // Mensaje corregido
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
         }

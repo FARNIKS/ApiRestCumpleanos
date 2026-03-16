@@ -9,11 +9,8 @@ class StoreEmployeeRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        /**
-         * Usamos el operador null-safe (?->) para evitar errores si el usuario es nulo.
-         * Esto verifica si el usuario existe y si tiene el rol de administrador.
-         */
-        return $this->user()?->isAdmin() ?? false;
+        $user = $this->user();
+        return $user?->isAdmin() ?? false;
     }
 
     public function rules(): array
@@ -24,7 +21,7 @@ class StoreEmployeeRequest extends FormRequest
             'estado'   => 'required|boolean',
 
             // FORZAMOS EL ESQUEMA CON CORCHETES (Sintaxis nativa de SQL Server)
-            'assignments_id' => 'required|exists:sqlsrv.assignments,id',
+            'assignment_id' => 'required|exists:sqlsrv.assignments,id',
             'branch_id'      => 'required|exists:branches,id',
         ];
     }

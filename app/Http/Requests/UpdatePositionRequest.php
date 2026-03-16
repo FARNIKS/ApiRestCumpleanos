@@ -4,6 +4,10 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+
+
 
 class UpdatePositionRequest extends FormRequest
 {
@@ -12,11 +16,8 @@ class UpdatePositionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        /**
-         * Usamos el operador null-safe (?->) para evitar errores si el usuario es nulo.
-         * Esto verifica si el usuario existe y si tiene el rol de administrador.
-         */
-        return $this->user()?->isAdmin() ?? false;
+        $user = $this->user();
+        return $user?->isAdmin() ?? false;
     }
 
     /**
@@ -27,7 +28,8 @@ class UpdatePositionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:positions,name,' . $this->route('position'),
+            'name'   => 'required|string|max:255|unique:positions,name,' . $this->route('position'),
+            'estado' => 'required|boolean',
         ];
     }
 }
