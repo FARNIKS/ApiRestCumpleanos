@@ -13,11 +13,9 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        // Eager loading para evitar consultas N+1
         $employees = Employee::with(['branch.company', 'assignment.position', 'assignment.department'])
-            ->where('estado', 1) // Solo empleados activos
             ->orderBy('name', 'asc')
-            ->paginate(15);
+            ->get();
 
         return EmployeeResource::collection($employees);
     }

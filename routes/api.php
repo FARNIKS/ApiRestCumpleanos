@@ -10,21 +10,33 @@ use App\Http\Controllers\api\DepartmentController;
 use App\Http\Controllers\api\PositionController;
 use App\Http\Controllers\api\AssignmentController;
 
-// Grupo de API Version 1
 Route::prefix('v1')->group(function () {
 
-    // Ruta pública para el acceso inicial
+    // --- RUTAS PÚBLICAS ---
+    // Ideales para visualizar tablas y llenar selects en formularios
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
 
-    // Rutas protegidas por tokens de Sanctum [3, 4]
+    // Solo permitimos GET (index y show) de forma pública
+    Route::get('employees', [EmployeeController::class, 'index']);
+    Route::get('employees/{employee}', [EmployeeController::class, 'show']);
+
+    Route::get('companies', [CompanyController::class, 'index']);
+    Route::get('branches', [BranchController::class, 'index']);
+    Route::get('departments', [DepartmentController::class, 'index']);
+    Route::get('positions', [PositionController::class, 'index']);
+    Route::get('assignments', [AssignmentController::class, 'index']);
+
+
+    // --- RUTAS PROTEGIDAS (Requieren Token) ---
     Route::middleware('auth:sanctum')->group(function () {
 
-        // Endpoint de identidad para React
         Route::get('/user', function (Request $request) {
             return new \App\Http\Resources\UserResource($request->user());
         });
 
-        // Recursos CRUD centralizados (excluye rutas de formularios Blade) [2, 5]
+        // Protegemos POST, PUT, PATCH y DELETE
+        // Usamos except(['index', 'show']) porque ya los definimos arriba como públicos
         Route::apiResources([
             'employees'   => EmployeeController::class,
             'companies'   => CompanyController::class,
@@ -32,9 +44,8 @@ Route::prefix('v1')->group(function () {
             'departments' => DepartmentController::class,
             'positions'   => PositionController::class,
             'assignments' => AssignmentController::class,
-        ]);
+        ], ['except' => ['index', 'show']]);
 
-        // Ruta segura para cerrar sesión
         Route::post('/logout', [AuthController::class, 'logout']);
     });
 });

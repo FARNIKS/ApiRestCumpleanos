@@ -21,23 +21,24 @@ class SendDailyBirthdays extends Command
         $data = $service->getProcessedBirthdays();
 
         // --- CASO A: ERROR DE INTEGRIDAD (Quórum < 550) ---
-        // NOTA: Si en pruebas tienes menos de 550 empleados, ajusta el 'is_null($data)' 
-        // o modifica tu BirthdayService para que el umbral sea menor durante el desarrollo.
         if (is_null($data)) {
+            // Durante pruebas, puedes cambiar esto a tu correo
             $recipients = ['whawowlolaxz@gmail.com'];
 
             Mail::to($recipients)->send(new ProcessErrorMail([
-                'message' => 'ALERTA URGENTE: Actualización Incompleta de Base de Datos (Quórum insuficiente)',
+                'message' => 'ALERTA URGENTE: Actualización Incompleta de Base de Datos (Menos de 550 registros)',
                 'timestamp' => now()->toDateTimeString()
             ]));
 
-            $this->error('Fallo de quórum. Alerta técnica enviada a tu correo.');
+            $this->error('Fallo de quórum. Alerta técnica enviada a pruebas.');
             return;
         }
 
-        // --- DESTINATARIO DE PRUEBAS ---
+        // --- DESTINATARIO DE PRUEBAS (TODO se redirige aquí) ---
         $mainRecipient = 'whawowlolaxz@gmail.com';
-        $bccList = []; // Mantenemos vacío para no enviar spam a producción
+
+        // BCC vacío para pruebas, así no envías correos masivos reales desde el Sandbox
+        $bccList = [];
 
         // --- CASO B: HAY CUMPLEAÑEROS ---
         if ($data['birthdays']->isNotEmpty()) {
@@ -45,7 +46,7 @@ class SendDailyBirthdays extends Command
                 ->bcc($bccList)
                 ->send(new BirthdayMail($data));
 
-            $this->info('Correos de felicitación enviados exitosamente al correo de pruebas.');
+            $this->info('Correos de felicitación enviados al correo de pruebas.');
         }
         // --- CASO C: DÍA SIN CUMPLEAÑOS ---
         else {
@@ -65,6 +66,7 @@ class SendDailyBirthdays extends Command
         $auditRecords = $service->getAuditRecords();
 
         if ($auditRecords->isNotEmpty()) {
+            // Destinatario de auditoría para pruebas
             $auditRecipients = ['whawowlolaxz@gmail.com'];
 
             Mail::to($auditRecipients)

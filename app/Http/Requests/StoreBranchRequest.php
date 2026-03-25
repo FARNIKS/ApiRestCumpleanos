@@ -7,9 +7,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Models\User;
 
 
-
-
-
 class StoreBranchRequest extends FormRequest
 {
     /**

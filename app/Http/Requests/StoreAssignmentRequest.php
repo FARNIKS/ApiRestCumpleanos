@@ -9,6 +9,19 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreAssignmentRequest extends FormRequest
 {
+
+    public function authorize(): bool
+    {
+        $user = $this->user();
+        return $user?->isAdmin() ?? false;
+    }
+
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
     {
         return [
