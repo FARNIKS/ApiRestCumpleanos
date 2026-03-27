@@ -16,8 +16,8 @@ class CompanyResource extends JsonResource
     {
         return [
             'id'       => $this->id,
-            'name'     => $this->name,
-            'isActive' => $this->estado,
+            'name'     => $this->name, // Ya viene formateado por el Accessor
+            'isActive' => (bool) $this->estado,
         ];
     }
 }

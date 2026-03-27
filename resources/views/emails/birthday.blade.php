@@ -93,12 +93,11 @@
         @foreach ($data['birthdays'] as $country => $companies)
             <div class="country-section">
                 @foreach ($companies as $companyName => $employees)
-                    <!-- Título Combinado: País + Empresa -->
-                    <h3 class="company-header">📍 {{ $country }} {{ $companyName }}:</h3>
+                    <h3 class="company-header">📍 {{ $country }} - {{ $companyName }}:</h3>
                     <ul class="employee-list">
                         @foreach ($employees as $employee)
                             <li class="employee-item">
-                                🎂 {{ $employee->name }}
+                                🎂 {{ $employee->Nombre }}
                             </li>
                         @endforeach
                     </ul>

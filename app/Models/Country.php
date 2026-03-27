@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
-class Position extends Model
+class Country extends Model
 {
-    protected $table = 'positions';
+    protected $table = 'countries';
 
     public $timestamps = false;
 
@@ -20,12 +20,11 @@ class Position extends Model
         'estado'   => 'boolean'
     ];
 
-
-    public function assignments()
+    public function branches()
     {
-        // Añadimos 'positions_id' para que Laravel no busque 'position_id'
-        return $this->hasMany(Assignment::class, 'position_id');
+        return $this->hasMany(Branch::class);
     }
+
     protected function name(): Attribute
     {
         return Attribute::make(

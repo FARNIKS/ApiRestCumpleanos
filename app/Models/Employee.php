@@ -8,51 +8,32 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Employee extends Model
 {
+    /*
+    protected $connection = 'sqlsrvax';
+
+    protected $table = 'AX_Usuarios_Cumple';*/
     protected $table = 'employees';
     public $timestamps = false;
 
-    protected $fillable = ['name', 'birthday', 'branch_id', 'assignment_id', 'estado'];
+    protected $fillable = ['Nombre', 'Cumple', 'Empresa'];
 
     protected $casts = [
-        'estado'   => 'boolean',
-        'birthday' => 'date',
+        'Cumple' => 'date',
     ];
 
     /* --- RELACIONES --- */
 
     public function branch(): BelongsTo
     {
-        return $this->belongsTo(Branch::class, 'branch_id');
+        return $this->belongsTo(Branch::class, 'Empresa', 'code');
     }
 
-    public function assignment(): BelongsTo
-    {
-        return $this->belongsTo(Assignment::class, 'assignment_id');
-    }
 
-    protected function name(): Attribute
+    protected function Nombre(): Attribute
     {
         return Attribute::make(
-            // Al obtenerlo: "RECURSOS HUMANOS" -> "Recursos Humanos"
-            get: fn(string $value) => mb_convert_case($value, MB_CASE_TITLE, "UTF-8"),
-
-            // Al guardarlo: "recursos humanos" -> "RECURSOS HUMANOS"
-            set: fn(string $value) => mb_strtoupper($value, "UTF-8"),
+            get: fn(?string $value) => $value ? mb_convert_case($value, MB_CASE_TITLE, "UTF-8") : '',
+            set: fn(?string $value) => $value ? mb_strtoupper($value, "UTF-8") : '',
         );
-    }
-    protected static function booted()
-    {
-        static::created(fn($employee) => $employee->branch()->increment('total_staff'));
-
-        // Usamos el evento 'updated' para detectar cuando el estado pasa a ser falso (desactivado)
-        static::updated(function ($employee) {
-            if ($employee->wasChanged('estado')) {
-                if ($employee->estado) {
-                    $employee->branch()->increment('total_staff');
-                } else {
-                    $employee->branch()->decrement('total_staff');
-                }
-            }
-        });
     }
 }

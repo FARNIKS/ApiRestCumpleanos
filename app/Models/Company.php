@@ -4,37 +4,30 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Company extends Model
 {
     protected $table = 'companies';
-
     public $timestamps = false;
 
-    protected $fillable = [
-        'name',
-        'estado'
-    ];
+    protected $fillable = ['name', 'estado'];
 
     protected $casts = [
-        'estado'   => 'boolean'
+        'estado' => 'boolean'
     ];
 
-
-
-    public function branches()
+    public function branches(): HasMany
     {
-        return $this->hasMany(Branch::class);
+        // Relación: Una empresa tiene muchas sucursales (vinculadas por company_id)
+        return $this->hasMany(Branch::class, 'company_id');
     }
 
     protected function name(): Attribute
     {
         return Attribute::make(
-            // Al obtenerlo: "RECURSOS HUMANOS" -> "Recursos Humanos"
-            get: fn(string $value) => mb_convert_case($value, MB_CASE_TITLE, "UTF-8"),
-
-            // Al guardarlo: "recursos humanos" -> "RECURSOS HUMANOS"
-            set: fn(string $value) => mb_strtoupper($value, "UTF-8"),
+            get: fn(?string $value) => $value ? mb_convert_case($value, MB_CASE_TITLE, "UTF-8") : '',
+            set: fn(?string $value) => $value ? mb_strtoupper($value, "UTF-8") : '',
         );
     }
 }

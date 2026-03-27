@@ -3,48 +3,32 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\api\EmployeeController;
-use App\Http\Controllers\api\BranchController;
-use App\Http\Controllers\api\CompanyController;
-use App\Http\Controllers\api\DepartmentController;
-use App\Http\Controllers\api\PositionController;
-use App\Http\Controllers\api\AssignmentController;
+use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\BranchController;
+use App\Http\Controllers\Api\CompanyController;
+use App\Http\Controllers\Api\CountryController;
 
 Route::prefix('v1')->group(function () {
 
     // --- RUTAS PÚBLICAS ---
-    // Ideales para visualizar tablas y llenar selects en formularios
+    // Ideales para el Login y para que el Frontend cargue Selects/Tablas iniciales
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
 
-    // Solo permitimos GET (index y show) de forma pública
-    Route::get('employees', [EmployeeController::class, 'index']);
-    Route::get('employees/{employee}', [EmployeeController::class, 'show']);
-
-    Route::get('companies', [CompanyController::class, 'index']);
-    Route::get('branches', [BranchController::class, 'index']);
-    Route::get('departments', [DepartmentController::class, 'index']);
-    Route::get('positions', [PositionController::class, 'index']);
-    Route::get('assignments', [AssignmentController::class, 'index']);
-
-
-    // --- RUTAS PROTEGIDAS (Requieren Token) ---
+    // --- RUTAS PROTEGIDAS (Requieren Token Sanctum) ---
     Route::middleware('auth:sanctum')->group(function () {
 
+        // Información del usuario autenticado
         Route::get('/user', function (Request $request) {
             return new \App\Http\Resources\UserResource($request->user());
         });
 
-        // Protegemos POST, PUT, PATCH y DELETE
-        // Usamos except(['index', 'show']) porque ya los definimos arriba como públicos
         Route::apiResources([
-            'employees'   => EmployeeController::class,
-            'companies'   => CompanyController::class,
-            'branches'    => BranchController::class,
-            'departments' => DepartmentController::class,
-            'positions'   => PositionController::class,
-            'assignments' => AssignmentController::class,
-        ], ['except' => ['index', 'show']]);
+            'employees' => EmployeeController::class,
+            'companies' => CompanyController::class,
+            'branches'  => BranchController::class,
+            'countries' => CountryController::class,
+        ]);
 
         Route::post('/logout', [AuthController::class, 'logout']);
     });

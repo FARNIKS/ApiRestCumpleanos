@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class DepartmentResource extends JsonResource
+class CountryResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,8 +17,7 @@ class DepartmentResource extends JsonResource
         return [
             'id'       => $this->id,
             'name'     => $this->name,
-            'isActive' => $this->estado,
-
+            'isActive' => (bool) $this->estado,
         ];
     }
 }

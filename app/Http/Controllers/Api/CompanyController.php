@@ -13,41 +13,40 @@ class CompanyController extends Controller
 {
     public function index()
     {
-        $company = Company::where('estado', true)
+        // Traemos las empresas activas
+        $companies = Company::where('estado', true)
             ->orderBy('name', 'asc')
             ->get();
 
-        return CompanyResource::collection($company);
+        return CompanyResource::collection($companies);
     }
 
     public function store(StoreCompanyRequest $request): JsonResponse
     {
         try {
             $company = Company::create($request->validated());
+
             return response()->json([
                 'status' => 'success',
+                'message' => 'Empresa creada con éxito',
                 'data'   => new CompanyResource($company)
             ], 201);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
         }
     }
-    public function show(Company $company): CompanyResource
-    {
-        return new CompanyResource($company);
-    }
 
 
     public function update(UpdateCompanyRequest $request, Company $company): JsonResponse
     {
         try {
-            // Al usar el Binding (Company $company), Laravel ya hace el findOrFail automáticamente
             $company->update($request->validated());
 
             return response()->json([
-                'status' => 'success',
-                'data'   => new CompanyResource($company)
-            ]);
+                'status'  => 'success',
+                'message' => 'Empresa actualizada correctamente',
+                'data'    => new CompanyResource($company->load('branches'))
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
         }
@@ -56,11 +55,11 @@ class CompanyController extends Controller
     public function destroy(Company $company): JsonResponse
     {
         try {
-            // Borrado lógico
             $company->update(['estado' => false]);
+
             return response()->json([
                 'status'  => 'success',
-                'message' => 'Empresa desactivada correctamente' // Mensaje corregido
+                'message' => 'Empresa desactivada correctamente'
             ], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);

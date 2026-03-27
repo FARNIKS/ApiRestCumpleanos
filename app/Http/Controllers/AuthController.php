@@ -21,6 +21,7 @@ class AuthController extends Controller
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Credenciales incorrectas'], 401);
         }
+        $user->tokens()->delete();
 
         // Creamos el token personal
         $token = $user->createToken('auth_token')->plainTextToken;

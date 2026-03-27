@@ -13,9 +13,7 @@ class Branch extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'code',
-        'country',
-        'total_staff',
+        'country_id',
         'company_id',
         'estado'
     ];
@@ -30,19 +28,17 @@ class Branch extends Model
         return $this->belongsTo(Company::class, 'company_id');
     }
 
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class, 'country_id');
+    }
+
     public function employees()
     {
         return $this->hasMany(Employee::class);
     }
 
     protected function name(): Attribute
-    {
-        return Attribute::make(
-            get: fn(string $value) => mb_convert_case($value, MB_CASE_TITLE, "UTF-8"),
-            set: fn(string $value) => mb_strtoupper($value, "UTF-8"),
-        );
-    }
-    protected function country(): Attribute
     {
         return Attribute::make(
             get: fn(string $value) => mb_convert_case($value, MB_CASE_TITLE, "UTF-8"),

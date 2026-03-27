@@ -23,9 +23,10 @@ class UpdateCompanyRequest extends FormRequest
      */
     public function rules(): array
     {
+        $companyId = $this->route('company')->id;
         return [
-            'name'   => 'sometimes|string|max:255|unique:companies,name,' . $this->route('company'),
-            'estado' => 'sometimes|boolean',
+            'name'   => 'required|string|max:255|unique:companies,name,' . $companyId,
+            'estado' => 'required|boolean',
         ];
     }
 }

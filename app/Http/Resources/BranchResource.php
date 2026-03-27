@@ -15,13 +15,12 @@ class BranchResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'             => $this->id,
-            'country'        => $this->country,
-            'code'           => $this->code,
-            'companyName'    => $this->company->name ?? 'No Company Assigned',
-            'totalEmployees' => $this->total_staff ?? 0,
-            'companyId'      => $this->company_id,
-            'isActive'       => $this->estado,
+            // El identificador real es el código (CEON, ATI, etc.)
+            'code'        => $this->code,
+            'companyName' => $this->company->name ?? 'N/A',
+            'countryName' => $this->country->name ?? 'N/A',
+            'isActive'    => (bool) $this->estado,
+
         ];
     }
 }

@@ -11,47 +11,63 @@ use Illuminate\Http\JsonResponse;
 
 class BranchController extends Controller
 {
+    /**
+     * Listar sucursales activas.
+     */
     public function index()
     {
-        $branches = Branch::with('company')
+        $branches = Branch::with(['company', 'country'])
             ->where('estado', true)
             ->orderBy('code', 'asc')
             ->get();
 
+        // Retorna la colección transformada directamente
         return BranchResource::collection($branches);
     }
 
+    /**
+     * Crear una nueva sucursal.
+     */
     public function store(StoreBranchRequest $request): JsonResponse
     {
         try {
             $branch = Branch::create($request->validated());
-            return response()->json(['status' => 'success', 'data' => new BranchResource($branch->load('company'))], 201);
+
+            return response()->json([
+                'status' => 'success',
+                // Usamos el Resource pero dentro del array de respuesta
+                'data' => new BranchResource($branch->load(['company', 'country']))
+            ], 201);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error al crear la sucursal',
+                'info' => $e->getMessage()
+            ], 500);
         }
     }
 
-    public function show(Branch $branch): BranchResource
+    /**
+     * Mostrar una sucursal específica.
+     */
+    public function show(Branch $branch)
     {
-        return new BranchResource($branch);
+        // Retornamos el Resource directamente (Laravel lo convierte a JSON)
+        return new BranchResource($branch->load(['company', 'country']));
     }
 
-    public function update(UpdateBranchRequest $request, $id): JsonResponse
+    /**
+     * Actualizar sucursal.
+     */
+    public function update(UpdateBranchRequest $request, Branch $branch): JsonResponse
     {
         try {
-            // 1. Buscar la sucursal o lanzar error 404 si no existe
-            $branch = Branch::findOrFail($id);
-
-            // 2. Actualizar con los datos validados del Request
             $branch->update($request->validated());
-
-            // 3. Cargar la empresa vinculada para la respuesta JSON
-            $branch->load('company');
 
             return response()->json([
                 'status'  => 'success',
                 'message' => 'Sucursal actualizada correctamente',
-                'data'    => new BranchResource($branch)
+                'data'    => new BranchResource($branch->load(['company', 'country']))
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -62,17 +78,23 @@ class BranchController extends Controller
         }
     }
 
-
+    /**
+     * Desactivar sucursal.
+     */
     public function destroy(Branch $branch): JsonResponse
     {
         try {
             $branch->update(['estado' => false]);
+
             return response()->json([
                 'status'  => 'success',
-                'message' => 'Departamento desactivado correctamente'
+                'message' => 'Sucursal desactivada correctamente'
             ], 200);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => 'error',
+                'info' => $e->getMessage()
+            ], 500);
         }
     }
 }

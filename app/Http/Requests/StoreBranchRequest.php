@@ -2,15 +2,12 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\User;
-
 
 class StoreBranchRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Solo permitimos que el administrador cree sucursales.
      */
     public function authorize(): bool
     {
@@ -19,18 +16,34 @@ class StoreBranchRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
+     * Reglas de validación ajustadas a CorporateHRP.
      */
     public function rules(): array
     {
         return [
-            'code'       => 'required|string|max:255',
+            // 1. Validamos unicidad porque es la PK manual
+            'code' => 'required|string|max:10|unique:branches,code',
+
+            // 2. Relaciones obligatorias
             'company_id' => 'required|exists:companies,id',
-            'country'    => 'required|string|max:255',
-            'total_staff' => 'required|integer',
+            'country_id' => 'required|exists:countries,id',
+
+            // 3. El estado es booleano (BIT en SQL Server)
             'estado' => 'required|boolean',
+        ];
+    }
+
+    /**
+     * Mensajes en español para que el usuario entienda qué falló.
+     */
+    public function messages(): array
+    {
+        return [
+            'code.unique' => 'Este código de sucursal ya está registrado en el sistema.',
+            'code.max' => 'El código no puede tener más de 10 caracteres.',
+            'company_id.exists' => 'La empresa seleccionada no existe.',
+            'country_id.exists' => 'El país seleccionado no existe.',
+            'estado.boolean' => 'El estado debe ser Activo o Inactivo.',
         ];
     }
 }
