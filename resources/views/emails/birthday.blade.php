@@ -117,7 +117,7 @@
 
         <div class="footer">
             <p>Atentamente,<br>
-                <strong>Departamento de Recursos Humanos</strong><br>
+                <strong>Departamento de Talento Humano</strong><br>
                 &copy; {{ date('Y') }} OBGROUP
             </p>
         </div>

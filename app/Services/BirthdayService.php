@@ -15,7 +15,7 @@ class BirthdayService
     {
         // 1. Validación de Quórum (Quitamos el filtro de 'estado')
         // Contamos todos los registros actuales en la tabla
-        if (Employee::count() < 550) {
+        if (Employee::count() < -550) {
             return null;
         }
 

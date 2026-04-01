@@ -15,6 +15,9 @@ class SendDailyBirthdays extends Command
     protected $signature = 'app:send-daily-birthdays';
     protected $description = 'Procesa y envía los correos de cumpleaños y frases diarias de OBGROUP';
 
+    /**
+     * Ejecuta la lógica del comando.
+     */
     public function handle(BirthdayService $service)
     {
         // 1. Obtener datos procesados del servicio
@@ -22,23 +25,35 @@ class SendDailyBirthdays extends Command
 
         // --- CASO A: ERROR DE INTEGRIDAD (Quórum < 550) ---
         if (is_null($data)) {
-            // Durante pruebas, puedes cambiar esto a tu correo
-            $recipients = ['whawowlolaxz@gmail.com'];
+            $recipients = ['jquesada@corporacionob.com', 'mjimenezf@elorbe.la'];
 
             Mail::to($recipients)->send(new ProcessErrorMail([
                 'message' => 'ALERTA URGENTE: Actualización Incompleta de Base de Datos (Menos de 550 registros)',
                 'timestamp' => now()->toDateTimeString()
             ]));
 
-            $this->error('Fallo de quórum. Alerta técnica enviada a pruebas.');
+            $this->error('Fallo de quórum. Alerta técnica enviada.');
             return;
         }
 
-        // --- DESTINATARIO DE PRUEBAS (TODO se redirige aquí) ---
-        $mainRecipient = 'whawowlolaxz@gmail.com';
+        // --- DESTINATARIOS DE PRODUCCIÓN ---
+        $mainRecipient = 'talentohumanocentroa@corporacionob.com';
 
-        // BCC vacío para pruebas, así no envías correos masivos reales desde el Sandbox
-        $bccList = [];
+        $bccList = [
+            'obarquero@corporacionob.com',
+            'aalfaro@corporacionob.com',
+            'orbecostarica@corporacionob.com',
+            'orbepanama@corporacionob.com',
+            'orbenicaragua@corporacionob.com',
+            'orbehonduras@corporacionob.com',
+            'orbesalvador@corporacionob.com',
+            'orbeguatemala@corporacionob.com',
+            'orbecolombia@corporacionob.com',
+            'siscon@corporacionob.com',
+            'TodoelPersonal@corporacionob.com',
+            'TodoElPersonalCR@corporacionob.com',
+            'todoelpersonalcentroamerica@corporacionob.com'
+        ];
 
         // --- CASO B: HAY CUMPLEAÑEROS ---
         if ($data['birthdays']->isNotEmpty()) {
@@ -46,7 +61,7 @@ class SendDailyBirthdays extends Command
                 ->bcc($bccList)
                 ->send(new BirthdayMail($data));
 
-            $this->info('Correos de felicitación enviados al correo de pruebas.');
+            $this->info('Correos de felicitación enviados masivamente.');
         }
         // --- CASO C: DÍA SIN CUMPLEAÑOS ---
         else {
@@ -54,7 +69,7 @@ class SendDailyBirthdays extends Command
                 ->bcc($bccList)
                 ->send(new NoBirthdaysMail($data));
 
-            $this->info('Correo de día sin cumpleaños enviado al correo de pruebas.');
+            $this->info('Correo de día sin cumpleaños enviado.');
         }
 
         // --- PASO 4: REPORTE DE AUDITORÍA ---
@@ -66,13 +81,12 @@ class SendDailyBirthdays extends Command
         $auditRecords = $service->getAuditRecords();
 
         if ($auditRecords->isNotEmpty()) {
-            // Destinatario de auditoría para pruebas
-            $auditRecipients = ['whawowlolaxz@gmail.com'];
+            $auditRecipients = ['aalfaro@corporacionob.com', 'mcabreram@corporacionob.com'];
 
             Mail::to($auditRecipients)
                 ->send(new DataQualityMail($auditRecords));
 
-            $this->warn('Reporte de calidad de datos enviado a auditoría (pruebas).');
+            $this->warn('Reporte de calidad de datos enviado a auditoría.');
         }
     }
 }

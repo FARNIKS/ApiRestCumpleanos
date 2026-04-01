@@ -71,8 +71,8 @@
 
 <body>
     <div class="container">
-        <!-- Banner Corporativo (Sugerencia: Usa una imagen de equipo o logo institucional) -->
-        <img src="https://www.elorbe.la/images/cumpleanos.jpg" alt="OBGROUP Institucional" class="banner">
+        <!-- Banner Corporativo (Sugerencia: Usa una imagen de equipo o logo institucional)
+        <img src="https://www.elorbe.la/images/cumpleanos.jpg" alt="OBGROUP Institucional" class="banner">-->
 
         <p class="intro-text">
             ¡Buen día, equipo de <strong>OBGROUP</strong>! <br><br>
@@ -90,7 +90,7 @@
 
         <div class="footer">
             <p>Atentamente,<br>
-                <strong>Departamento de Recursos Humanos</strong><br>
+                <strong>Departamento de Talento Humano</strong><br>
                 &copy; {{ date('Y') }} OBGROUP
             </p>
         </div>
