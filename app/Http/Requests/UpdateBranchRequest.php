@@ -8,7 +8,7 @@ use Illuminate\Validation\Rule;
 class UpdateBranchRequest extends FormRequest
 {
     /**
-     * Solo el administrador puede editar sucursales.
+     * Solo permitimos que el administrador actualice sucursales.
      */
     public function authorize(): bool
     {
@@ -21,34 +21,35 @@ class UpdateBranchRequest extends FormRequest
      */
     public function rules(): array
     {
-        // Obtenemos el código actual de la ruta (ej. /branches/CEON)
+        // Obtenemos el parámetro de la ruta ('ATI', 'CEO', etc.)
         $branchCode = $this->route('branch');
 
+        // Si pasas el objeto modelo, extraemos el valor de la llave primaria
+        $ignoreKey = is_object($branchCode) ? $branchCode->code : $branchCode;
+
         return [
-            // Validamos que sea único, pero IGNORANDO el registro actual
             'code' => [
                 'required',
                 'string',
                 'max:10',
-                Rule::unique('branches', 'code')->ignore($branchCode, 'code'),
+                // Ignoramos el registro actual usando su código único
+                Rule::unique('branches', 'code')->ignore($ignoreKey, 'code'),
             ],
-
-            'company_id' => 'required|exists:companies,id',
-            'country_id' => 'required|exists:countries,id',
-            'estado'     => 'required|boolean',
+            'company_name' => 'sometimes|string|max:255',
+            'country_id'   => 'sometimes|exists:countries,id',
+            'estado'       => 'sometimes|boolean',
         ];
     }
-
     /**
      * Mensajes personalizados.
      */
     public function messages(): array
     {
         return [
-            'code.unique' => 'No puedes usar este código porque ya pertenece a otra sucursal.',
-            'code.required' => 'El código de la sucursal es obligatorio.',
-            'company_id.exists' => 'La empresa seleccionada no es válida.',
+            'code.unique'       => 'Este código de sucursal ya pertenece a otra sede.',
+            'code.max'          => 'El código no puede tener más de 10 caracteres.',
             'country_id.exists' => 'El país seleccionado no es válido.',
+            'estado.boolean'    => 'El valor del estado es incorrecto.',
         ];
     }
 }

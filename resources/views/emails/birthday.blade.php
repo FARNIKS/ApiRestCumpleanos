@@ -89,7 +89,6 @@
             Hoy celebramos a nuestros valiosos compañeros.
         </p>
 
-        <!-- Iteración Jerárquica: País > Empresa > Empleado -->
         @foreach ($data['birthdays'] as $country => $companies)
             <div class="country-section">
                 @foreach ($companies as $companyName => $employees)

@@ -11,9 +11,8 @@ class EmployeeController extends Controller
 
     public function index()
     {
-        // Ajustamos el Eager Loading a la nueva estructura de relaciones
-        // Y el ordenamiento por la columna real 'Nombre'
-        $employees = Employee::with(['branch.company', 'branch.country'])
+        // Quitamos 'branch.company' porque ahora es un campo de texto en branch
+        $employees = Employee::with(['branch.country'])
             ->orderBy('Nombre', 'asc')
             ->get();
 
@@ -26,7 +25,7 @@ class EmployeeController extends Controller
     public function show(Employee $employee): EmployeeResource
     {
         // Cargamos la cadena de relaciones para el recurso
-        $employee->load(['branch.company', 'branch.country']);
+        $employee->load(['branch.country']);
 
         return new EmployeeResource($employee);
     }

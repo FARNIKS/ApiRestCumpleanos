@@ -58,7 +58,8 @@
         <div class="header">⚠️ NOTIFICACIÓN DE ERROR DE SISTEMA</div>
 
         <p>Se ha detectado una anomalía durante la ejecución del proceso automatizado de cumpleaños para
-            <strong>OBGROUP</strong>.</p>
+            <strong>OBGROUP</strong>.
+        </p>
 
         <div class="error-box">
             <p><span class="label">Mensaje de Error:</span><br>

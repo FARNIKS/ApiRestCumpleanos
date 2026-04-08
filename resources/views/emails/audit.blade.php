@@ -52,10 +52,10 @@
             @foreach ($auditRecords as $employee)
                 <tr>
                     <td>{{ $employee->id }}</td>
-                    <td>{{ $employee->name }}</td>
-                    <td>{{ $employee->birthday ? $employee->birthday->format('d/m/Y') : 'VACÍO' }}</td>
+                    <td>{{ $employee->Nombre }}</td>
+                    <td>{{ $employee->Cumple ? $employee->Cumple->format('d/m/Y') : 'VACÍO' }}</td>
                     <td class="alert">
-                        {{ is_null($employee->birthday) ? 'Fecha no definida' : 'Edad fuera de rango lógico' }}
+                        {{ is_null($employee->Cumple) ? 'Fecha no definida' : 'Edad fuera de rango lógico' }}
                     </td>
                 </tr>
             @endforeach

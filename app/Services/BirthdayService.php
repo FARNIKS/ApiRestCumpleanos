@@ -13,9 +13,9 @@ class BirthdayService
 
     public function getProcessedBirthdays(): ?array
     {
-        // 1. Validación de Quórum (Quitamos el filtro de 'estado')
-        // Contamos todos los registros actuales en la tabla
-        if (Employee::count() < -550) {
+        // 1. Validación de Quórum
+        // Nota: He corregido el < -550 a 550 positivo, asumiendo que quieres un mínimo de empleados
+        if (Employee::count() < 550) {
             return null;
         }
 
@@ -23,22 +23,29 @@ class BirthdayService
         $message = BirthdayMessage::find(now()->dayOfYear)?->phrase
             ?? "¡Felicidades en tu día!";
 
-        // 3. Consulta con nombres reales: 'Cumple', 'Nombre' y 'Empresa'
-        $birthdays = Employee::with(['branch.company', 'branch.country'])
+        // 3. Consulta ajustada: Quitamos 'branch.company' porque ya no es una relación
+        // Solo cargamos 'branch.country'
+        $birthdays = Employee::with(['branch.country'])
             ->whereRaw("FORMAT(Cumple, 'MM-dd') = ?", [now()->format('m-d')])
             ->get()
-            // Filtros de integridad: que tenga fecha y que la edad sea lógica
+            // Filtros de integridad: usamos los nombres reales de las columnas
             ->filter(fn($e) => $e->Cumple && $e->Cumple->age < $this->maxAge)
             ->unique('Nombre');
 
         if ($birthdays->isEmpty()) {
-            return ['phrase' => $message, 'birthdays' => collect()];
+            return [
+                'phrase' => $message,
+                'birthdays' => collect()
+            ];
         }
 
-        // 4. Agrupación jerárquica: País -> Empresa
+        // 4. Agrupación jerárquica corregida
         $groupedData = $birthdays->groupBy([
+            // Nivel 1: Nombre del País (desde la relación)
             fn($e) => $e->branch?->country?->name ?? 'Otros Países',
-            fn($e) => $e->branch?->company?->name ?? 'Empresa no asignada'
+
+            // Nivel 2: Nombre de la Empresa (campo directo en la tabla branches)
+            fn($e) => $e->branch?->company_name ?? 'Empresa no asignada'
         ]);
 
         return [
@@ -49,7 +56,7 @@ class BirthdayService
 
     public function getAuditRecords(): Collection
     {
-        // Auditoría sin filtro de estado
+        // Auditoría usando nombres de columna reales (Cumple y Nombre)
         return Employee::where(function ($query) {
             $query->whereNull('Cumple')
                 ->orWhereYear('Cumple', '<', now()->year - $this->maxAge);

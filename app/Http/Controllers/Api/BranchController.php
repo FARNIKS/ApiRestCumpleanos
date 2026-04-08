@@ -16,12 +16,11 @@ class BranchController extends Controller
      */
     public function index()
     {
-        $branches = Branch::with(['company', 'country'])
+        $branches = Branch::with(['country']) // Solo cargamos país
             ->where('estado', true)
             ->orderBy('code', 'asc')
             ->get();
 
-        // Retorna la colección transformada directamente
         return BranchResource::collection($branches);
     }
 
@@ -36,7 +35,7 @@ class BranchController extends Controller
             return response()->json([
                 'status' => 'success',
                 // Usamos el Resource pero dentro del array de respuesta
-                'data' => new BranchResource($branch->load(['company', 'country']))
+                'data' => new BranchResource($branch->load(['country']))
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -53,7 +52,7 @@ class BranchController extends Controller
     public function show(Branch $branch)
     {
         // Retornamos el Resource directamente (Laravel lo convierte a JSON)
-        return new BranchResource($branch->load(['company', 'country']));
+        return new BranchResource($branch->load(['country']));
     }
 
     /**
@@ -61,21 +60,15 @@ class BranchController extends Controller
      */
     public function update(UpdateBranchRequest $request, Branch $branch): JsonResponse
     {
-        try {
-            $branch->update($request->validated());
+        // Si en tu modelo Branch tienes: protected $primaryKey = 'code';
+        // Laravel encontrará la sucursal automáticamente por el código en la URL.
+        $branch->update($request->validated());
 
-            return response()->json([
-                'status'  => 'success',
-                'message' => 'Sucursal actualizada correctamente',
-                'data'    => new BranchResource($branch->load(['company', 'country']))
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'No se pudo actualizar la sucursal',
-                'info'    => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Sucursal actualizada',
+            'data'    => new BranchResource($branch)
+        ]);
     }
 
     /**

@@ -7,19 +7,18 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class EmployeeResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         return [
-            'name'     => $this->Nombre,
-            'birthday' => $this->Cumple ? $this->Cumple->format('Y-m-d') : null,
-            'company'  => $this->branch->company->name ?? 'N/A',
-            'country'  => $this->branch->country->name ?? 'N/A',
-            'branch_code' => $this->Empresa,
+            'Nombre'  => $this->Nombre,
+            'company' => $this->branch?->company_name ?? 'Sin Empresa',
+            'country' => $this->branch?->country?->name ?? 'Sin País',
+
+            // ESTA ES LA CLAVE: 
+            // En tu DB el código está en la columna 'Empresa'
+            'Empresa' => $this->Empresa,
+
+            'Cumple'  => $this->Cumple?->format('Y-m-d'),
         ];
     }
 }

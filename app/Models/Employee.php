@@ -21,15 +21,13 @@ class Employee extends Model
         'Cumple' => 'date',
     ];
 
-    /* --- RELACIONES --- */
-
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class, 'Empresa', 'code');
     }
 
 
-    protected function Nombre(): Attribute
+    protected function nombre(): Attribute
     {
         return Attribute::make(
             get: fn(?string $value) => $value ? mb_convert_case($value, MB_CASE_TITLE, "UTF-8") : '',

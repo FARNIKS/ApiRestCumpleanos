@@ -21,15 +21,10 @@ class StoreBranchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // 1. Validamos unicidad porque es la PK manual
-            'code' => 'required|string|max:10|unique:branches,code',
-
-            // 2. Relaciones obligatorias
-            'company_id' => 'required|exists:companies,id',
-            'country_id' => 'required|exists:countries,id',
-
-            // 3. El estado es booleano (BIT en SQL Server)
-            'estado' => 'required|boolean',
+            'code'         => 'required|string|max:10|unique:branches,code',
+            'company_name' => 'required|string|max:255', // El nombre "ORBE"
+            'country_id'   => 'required|exists:countries,id',
+            'estado'       => 'required|boolean',
         ];
     }
 

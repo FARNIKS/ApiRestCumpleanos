@@ -15,12 +15,10 @@ class BranchResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            // El identificador real es el código (CEON, ATI, etc.)
             'code'        => $this->code,
-            'companyName' => $this->company->name ?? 'N/A',
-            'countryName' => $this->country->name ?? 'N/A',
+            'company_name'     => $this->company_name, // Directo de la tabla branches
+            'country_name' => $this->country->name ?? 'N/A',
             'isActive'    => (bool) $this->estado,
-
         ];
     }
 }

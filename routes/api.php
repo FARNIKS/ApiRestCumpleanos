@@ -25,7 +25,6 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResources([
             'employees' => EmployeeController::class,
-            'companies' => CompanyController::class,
             'branches'  => BranchController::class,
             'countries' => CountryController::class,
         ]);
