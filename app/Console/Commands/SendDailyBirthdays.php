@@ -81,7 +81,7 @@ class SendDailyBirthdays extends Command
         $auditRecords = $service->getAuditRecords();
 
         if ($auditRecords->isNotEmpty()) {
-            $auditRecipients = ['aalfaro@corporacionob.com', 'mcabreram@corporacionob.com'];
+            $auditRecipients = ['jquesada@corporacionob.com', 'mjimenezf@elorbe.la'];
 
             Mail::to($auditRecipients)
                 ->send(new DataQualityMail($auditRecords));
