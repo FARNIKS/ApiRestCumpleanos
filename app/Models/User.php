@@ -16,9 +16,10 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
+        'alias',
         'email',
         'password',
-        'role', // <--- AGREGAMOS ESTA COLUMNA
+        'role',
     ];
 
     protected $hidden = [

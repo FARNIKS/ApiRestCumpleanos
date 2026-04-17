@@ -16,6 +16,7 @@ class UserResource extends JsonResource
     {
         return [
             'id'    => $this->id,
+            'username' => $this->alias,
             'name'  => $this->name,
             'email' => $this->email,
             'role'  => $this->role, // Vital para la lógica de React [5]
