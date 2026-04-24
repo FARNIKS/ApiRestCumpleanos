@@ -2,10 +2,9 @@
 
 namespace App\Mail;
 
+use App\Models\NoBirthdayConfig; // IMPORTANTE
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -15,17 +14,15 @@ class NoBirthdaysMail extends Mailable
     use Queueable, SerializesModels;
 
     public $data;
-    /**
-     * Create a new message instance.
-     */
+    public $config; // Declaramos la variable pública
+
     public function __construct(array $data)
     {
         $this->data = $data;
+        // Buscamos la configuración de "No Cumpleaños"
+        $this->config = NoBirthdayConfig::first();
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -33,21 +30,13 @@ class NoBirthdaysMail extends Mailable
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(
-            view: 'emails.noBirthday',
+            view: 'emails.no-birthday', // Debe coincidir con el nombre de tu archivo blade
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, Attachment>
-     */
     public function attachments(): array
     {
         return [];

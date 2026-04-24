@@ -21,40 +21,8 @@ class CountryController extends Controller
         return CountryResource::collection($countries);
     }
 
-    public function store(StoreCountryRequest $request): JsonResponse
+    public function show(Country $countries)
     {
-        try {
-            $country = Country::create($request->validated());
-            return response()->json([
-                'status' => 'success',
-                'data'   => new CountryResource($country)
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
-        }
-    }
-
-    public function update(UpdateCountryRequest $request, Country $country): JsonResponse
-    {
-        try {
-            $country->update($request->validated());
-            return response()->json([
-                'status'  => 'success',
-                'message' => 'País actualizado',
-                'data'    => new CountryResource($country)
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
-        }
-    }
-
-    public function destroy(Country $country): JsonResponse
-    {
-        try {
-            $country->update(['estado' => false]);
-            return response()->json(['status' => 'success', 'message' => 'País desactivado'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'info' => $e->getMessage()], 500);
-        }
+        return new CountryResource($countries);
     }
 }

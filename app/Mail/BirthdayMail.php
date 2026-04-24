@@ -2,10 +2,9 @@
 
 namespace App\Mail;
 
+use App\Models\BirthdayConfig; // IMPORTANTE
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -15,17 +14,15 @@ class BirthdayMail extends Mailable
     use Queueable, SerializesModels;
 
     public $data;
-    /**
-     * Create a new message instance.
-     */
+    public $config; // Declaramos la variable pública
+
     public function __construct(array $data)
     {
         $this->data = $data;
+        // Buscamos la configuración en la base de datos
+        $this->config = BirthdayConfig::first();
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -33,21 +30,13 @@ class BirthdayMail extends Mailable
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(
-            view: 'emails.birthday',
+            view: 'emails.birthday', // Asegúrate de que el nombre del archivo sea exacto
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, Attachment>
-     */
     public function attachments(): array
     {
         return [];

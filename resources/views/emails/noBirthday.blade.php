@@ -3,7 +3,6 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -20,16 +19,9 @@
             border: 1px solid #f0f0f0;
         }
 
-        .banner {
-            width: 100%;
-            height: auto;
-            border-radius: 4px;
-            display: block;
-        }
-
         .intro-text {
             font-size: 1.1em;
-            margin-top: 25px;
+            margin-top: 10px;
             color: #444;
         }
 
@@ -71,26 +63,20 @@
 
 <body>
     <div class="container">
-        <!-- Banner Corporativo (Sugerencia: Usa una imagen de equipo o logo institucional)
-        <img src="https://www.elorbe.la/images/cumpleanos.jpg" alt="OBGROUP Institucional" class="banner">-->
-
         <p class="intro-text">
-            ¡Buen día, equipo de <strong>OBGROUP</strong>! <br><br>
-            Hoy no registramos compañeros de cumpleaños en nuestras sucursales, pero aprovechamos este espacio para
-            compartir un mensaje de valor con todos ustedes.
+            {!! nl2br(e($config->intro_text)) !!}
         </p>
 
-        <!-- El corazón del correo: La Frase del Día -->
         <div class="phrase-box">
-            <span class="phrase-title">Inspiración para hoy</span>
+            <span class="phrase-title">{{ $config->main_body }}</span>
             <p class="phrase-text">"{{ $data['phrase'] }}"</p>
         </div>
 
-        <p>¡Les deseamos una jornada llena de productividad y éxito!</p>
+        <p>{!! nl2br(e($config->closing_text)) !!}</p>
 
         <div class="footer">
             <p>Atentamente,<br>
-                <strong>Departamento de Talento Humano</strong><br>
+                <strong>{{ $config->sign_off }}</strong><br>
                 &copy; {{ date('Y') }} OBGROUP
             </p>
         </div>

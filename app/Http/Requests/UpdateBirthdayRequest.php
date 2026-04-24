@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateCountryRequest extends FormRequest
+class UpdateBirthdayRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,12 @@ class UpdateCountryRequest extends FormRequest
      */
     public function rules(): array
     {
-        $countryId = $this->route('country')->id;
         return [
-            'name'   => 'required|string|max:255|unique:countries,name,' . $countryId,
-            'estado' => 'required|boolean',
+            'banner_url'   => 'nullable|string',
+            'intro_text'   => 'required|string',
+            'main_body'    => 'required|string',
+            'closing_text' => 'required|string',
+            'sign_off'     => 'required|string|max:150',
         ];
     }
 }

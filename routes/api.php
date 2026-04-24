@@ -5,13 +5,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\BranchController;
-use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\CountryController;
+// Importamos los nuevos controladores
+use App\Http\Controllers\Api\BirthdayConfigController;
+use App\Http\Controllers\Api\NoBirthdayConfigController;
 
 Route::prefix('v1')->group(function () {
 
     // --- RUTAS PÚBLICAS ---
-    // Ideales para el Login y para que el Frontend cargue Selects/Tablas iniciales
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
 
@@ -21,6 +22,19 @@ Route::prefix('v1')->group(function () {
         // Información del usuario autenticado
         Route::get('/user', function (Request $request) {
             return new \App\Http\Resources\UserResource($request->user());
+        });
+
+        // Configuración de Correos de Cumpleaños
+        Route::prefix('settings')->group(function () {
+            // Rutas para Cumpleaños (Birthday)
+            Route::get('/birthday', [BirthdayConfigController::class, 'index']);
+            Route::put('/birthday', [BirthdayConfigController::class, 'update']);
+            Route::post('/birthday/restore', [BirthdayConfigController::class, 'restore']);
+
+            // Rutas para No Cumpleaños (No Birthday)
+            Route::get('/no-birthday', [NoBirthdayConfigController::class, 'index']);
+            Route::put('/no-birthday', [NoBirthdayConfigController::class, 'update']);
+            Route::post('/no-birthday/restore', [NoBirthdayConfigController::class, 'restore']);
         });
 
         Route::apiResources([

@@ -3,7 +3,6 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -63,11 +62,6 @@
             font-style: italic;
         }
 
-        .footer-text {
-            font-size: 0.95em;
-            color: #555;
-        }
-
         .footer {
             font-size: 0.85em;
             color: #999;
@@ -81,12 +75,10 @@
 
 <body>
     <div class="container">
-        <!-- Imagen Banner según tu estructura -->
-        <img src="https://www.elorbe.la/images/cumpleanos.jpg" alt="Image birthday banner" class="banner">
+        <img src="{{ $config->banner_url }}" alt="Banner Cumpleaños" class="banner">
 
         <p class="intro-text">
-            ¡Feliz Cumpleaños de parte de <strong>OBGROUP</strong>! <br>
-            Hoy celebramos a nuestros valiosos compañeros.
+            {!! nl2br(e($config->intro_text)) !!}
         </p>
 
         @foreach ($data['birthdays'] as $country => $companies)
@@ -95,28 +87,25 @@
                     <h3 class="company-header">📍 {{ $country }} - {{ $companyName }}:</h3>
                     <ul class="employee-list">
                         @foreach ($employees as $employee)
-                            <li class="employee-item">
-                                🎂 {{ $employee->Nombre }}
-                            </li>
+                            <li class="employee-item">🎂 {{ $employee->Nombre }}</li>
                         @endforeach
                     </ul>
                 @endforeach
             </div>
         @endforeach
 
-        <div class="footer-text">
-            <p>Les deseamos un día lleno de alegría. ¡Que lo disfruten!</p>
-            <p><strong>¡Detente un momento para leer esto...!</strong></p>
+        <div style="margin-top: 25px;">
+            <p>{!! nl2br(e($config->main_body)) !!}</p>
+            <p><strong>{{ $config->closing_text }}</strong></p>
         </div>
 
-        <!-- Sección de la Frase Motivacional del día (1-366) -->
         <div class="phrase-box">
             <p style="margin:0; color: #856404;">"{{ $data['phrase'] }}"</p>
         </div>
 
         <div class="footer">
             <p>Atentamente,<br>
-                <strong>Departamento de Talento Humano</strong><br>
+                <strong>{{ $config->sign_off }}</strong><br>
                 &copy; {{ date('Y') }} OBGROUP
             </p>
         </div>
