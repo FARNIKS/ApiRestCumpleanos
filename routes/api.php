@@ -6,35 +6,26 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\BranchController;
 use App\Http\Controllers\Api\CountryController;
-// Importamos los nuevos controladores
 use App\Http\Controllers\Api\BirthdayConfigController;
 use App\Http\Controllers\Api\NoBirthdayConfigController;
 
 Route::prefix('v1')->group(function () {
 
-    // --- RUTAS PÚBLICAS ---
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/register', [AuthController::class, 'register']);
 
-    // --- RUTAS PROTEGIDAS (Requieren Token Sanctum) ---
+    Route::post('/login', [AuthController::class, 'login']);
+
     Route::middleware('auth:sanctum')->group(function () {
 
-        // Información del usuario autenticado
         Route::get('/user', function (Request $request) {
             return new \App\Http\Resources\UserResource($request->user());
         });
+        Route::post('/logout', [AuthController::class, 'logout']);
 
-        // Configuración de Correos de Cumpleaños
+        Route::get('/users', [AuthController::class, 'index']);
+
         Route::prefix('settings')->group(function () {
-            // Rutas para Cumpleaños (Birthday)
             Route::get('/birthday', [BirthdayConfigController::class, 'index']);
-            Route::put('/birthday', [BirthdayConfigController::class, 'update']);
-            Route::post('/birthday/restore', [BirthdayConfigController::class, 'restore']);
-
-            // Rutas para No Cumpleaños (No Birthday)
             Route::get('/no-birthday', [NoBirthdayConfigController::class, 'index']);
-            Route::put('/no-birthday', [NoBirthdayConfigController::class, 'update']);
-            Route::post('/no-birthday/restore', [NoBirthdayConfigController::class, 'restore']);
         });
 
         Route::apiResources([
@@ -43,6 +34,23 @@ Route::prefix('v1')->group(function () {
             'countries' => CountryController::class,
         ]);
 
-        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::middleware('admin')->group(function () {
+
+            // Gestión de Usuarios (Escritura)
+            Route::post('/register', [AuthController::class, 'register']);
+            Route::patch('/users/{user}', [AuthController::class, 'update']);
+            Route::patch('/users/status/{user}', [AuthController::class, 'toggleStatus']);
+
+            // Configuración de Correos (Escritura)
+            Route::prefix('settings')->group(function () {
+                // Birthday
+                Route::put('/birthday', [BirthdayConfigController::class, 'update']);
+                Route::post('/birthday/restore', [BirthdayConfigController::class, 'restore']);
+
+                // No Birthday
+                Route::put('/no-birthday', [NoBirthdayConfigController::class, 'update']);
+                Route::post('/no-birthday/restore', [NoBirthdayConfigController::class, 'restore']);
+            });
+        });
     });
 });
