@@ -12,7 +12,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('app:send-daily-birthdays')
-    ->dailyAt('13:21')
+    ->dailyAt('07:00')
     ->skip(function () {
         return (bool) Cache::get('birthdays_paused', false);
     });
