@@ -13,11 +13,7 @@ class EmployeeResource extends JsonResource
             'Nombre'  => $this->Nombre,
             'company' => $this->branch?->company_name ?? 'Sin Empresa',
             'country' => $this->branch?->country?->name ?? 'Sin País',
-
-            // ESTA ES LA CLAVE: 
-            // En tu DB el código está en la columna 'Empresa'
             'Empresa' => $this->Empresa,
-
             'Cumple'  => $this->Cumple?->format('Y-m-d'),
         ];
     }

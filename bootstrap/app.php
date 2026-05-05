@@ -17,9 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // CAPTURAR TODOS LOS ERRORES DE VALIDACIÓN DEL SISTEMA
         $exceptions->render(function (\Illuminate\Validation\ValidationException $e, $request) {
-            if ($request->is('api/*')) { // Solo si la ruta empieza por /api/
+            if ($request->is('api/*')) {
                 return response()->json([
                     'status'  => 'error',
                     'message' => 'Errores de validacion',

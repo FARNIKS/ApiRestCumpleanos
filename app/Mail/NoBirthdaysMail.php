@@ -19,7 +19,6 @@ class NoBirthdaysMail extends Mailable
     public function __construct(array $data)
     {
         $this->data = $data;
-        // Buscamos la configuración de "No Cumpleaños"
         $this->config = NoBirthdayConfig::first();
     }
 
@@ -33,7 +32,7 @@ class NoBirthdaysMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.no-birthday', // Debe coincidir con el nombre de tu archivo blade
+            view: 'emails.no-birthday',
         );
     }
 

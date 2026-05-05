@@ -81,9 +81,6 @@ class AuthController extends Controller
         return UserResource::collection(User::all());
     }
 
-    /**
-     * Registro con validación StoreUserRequest
-     */
     public function register(StoreUserRequest $request)
     {
         try {
@@ -126,9 +123,7 @@ class AuthController extends Controller
             'user'    => new UserResource($user)
         ], 200);
     }
-    /**
-     * Toggle con validación ToggleStatusRequest
-     */
+
     public function toggleStatus(Request $request, User $user)
     {
         if ($request->user()->id === $user->id) {

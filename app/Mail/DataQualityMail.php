@@ -18,17 +18,11 @@ class DataQualityMail extends Mailable
 
     public $auditRecords;
 
-    /**
-     * El constructor recibe la colección de registros inconsistentes.
-     */
     public function __construct(Collection $auditRecords)
     {
         $this->auditRecords = $auditRecords;
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -36,9 +30,6 @@ class DataQualityMail extends Mailable
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(
@@ -46,11 +37,6 @@ class DataQualityMail extends Mailable
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, Attachment>
-     */
     public function attachments(): array
     {
         return [];

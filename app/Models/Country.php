@@ -28,10 +28,8 @@ class Country extends Model
     protected function name(): Attribute
     {
         return Attribute::make(
-            // Al obtenerlo: "RECURSOS HUMANOS" -> "Recursos Humanos"
-            get: fn(string $value) => mb_convert_case($value, MB_CASE_TITLE, "UTF-8"),
 
-            // Al guardarlo: "recursos humanos" -> "RECURSOS HUMANOS"
+            get: fn(string $value) => mb_convert_case($value, MB_CASE_TITLE, "UTF-8"),
             set: fn(string $value) => mb_strtoupper($value, "UTF-8"),
         );
     }

@@ -8,9 +8,9 @@ use App\Http\Controllers\Api\BranchController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\BirthdayConfigController;
 use App\Http\Controllers\Api\NoBirthdayConfigController;
+use App\Http\Controllers\BirthdaySettingsController;
 
 Route::prefix('v1')->group(function () {
-
 
     Route::post('/login', [AuthController::class, 'login']);
 
@@ -20,8 +20,9 @@ Route::prefix('v1')->group(function () {
             return new \App\Http\Resources\UserResource($request->user());
         });
         Route::post('/logout', [AuthController::class, 'logout']);
-
         Route::get('/users', [AuthController::class, 'index']);
+
+        Route::get('settings/status', [BirthdaySettingsController::class, 'index']);
 
         Route::prefix('settings')->group(function () {
             Route::get('/birthday', [BirthdayConfigController::class, 'index']);
@@ -36,18 +37,17 @@ Route::prefix('v1')->group(function () {
 
         Route::middleware('admin')->group(function () {
 
-            // Gestión de Usuarios (Escritura)
             Route::post('/register', [AuthController::class, 'register']);
             Route::patch('/users/{user}', [AuthController::class, 'update']);
             Route::patch('/users/status/{user}', [AuthController::class, 'toggleStatus']);
 
-            // Configuración de Correos (Escritura)
             Route::prefix('settings')->group(function () {
-                // Birthday
+
+                Route::post('/toggle-pause', [BirthdaySettingsController::class, 'toggleStatus']);
+
                 Route::put('/birthday', [BirthdayConfigController::class, 'update']);
                 Route::post('/birthday/restore', [BirthdayConfigController::class, 'restore']);
 
-                // No Birthday
                 Route::put('/no-birthday', [NoBirthdayConfigController::class, 'update']);
                 Route::post('/no-birthday/restore', [NoBirthdayConfigController::class, 'restore']);
             });

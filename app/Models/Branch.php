@@ -9,14 +9,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Branch extends Model
 {
     protected $table = 'branches';
-    protected $primaryKey = 'code'; // Definimos 'code' como PK
-    public $incrementing = false;   // No es un ID auto-incremental
-    protected $keyType = 'string';  // Es de tipo string
+    protected $primaryKey = 'code';
+    public $incrementing = false;
+    protected $keyType = 'string';
     public $timestamps = false;
 
     protected $fillable = [
         'code',
-        'company_name', // El valor "ORBE", "SISCON" de tu imagen
+        'company_name',
         'country_id',
         'estado'
     ];

@@ -16,19 +16,12 @@ class ProcessErrorMail extends Mailable
 
 
     public $errorDetails;
-    /**
-     * Create a new message instance.
-     */
+
     public function __construct(array $errorDetails)
     {
-        // Recibe un arreglo con 'message', 'code' y 'timestamp'
         $this->errorDetails = $errorDetails;
     }
 
-
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -36,9 +29,6 @@ class ProcessErrorMail extends Mailable
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(
@@ -46,11 +36,6 @@ class ProcessErrorMail extends Mailable
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, Attachment>
-     */
     public function attachments(): array
     {
         return [];

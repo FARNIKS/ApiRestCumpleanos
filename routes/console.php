@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
+use Illuminate\Support\Facades\Cache;
 
 
 
@@ -11,4 +12,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('app:send-daily-birthdays')
-    ->dailyAt('07:00');
+    ->dailyAt('13:21')
+    ->skip(function () {
+        return (bool) Cache::get('birthdays_paused', false);
+    });

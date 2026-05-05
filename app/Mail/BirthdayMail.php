@@ -14,12 +14,11 @@ class BirthdayMail extends Mailable
     use Queueable, SerializesModels;
 
     public $data;
-    public $config; // Declaramos la variable pública
+    public $config;
 
     public function __construct(array $data)
     {
         $this->data = $data;
-        // Buscamos la configuración en la base de datos
         $this->config = BirthdayConfig::first();
     }
 
@@ -33,7 +32,7 @@ class BirthdayMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.birthday', // Asegúrate de que el nombre del archivo sea exacto
+            view: 'emails.birthday',
         );
     }
 

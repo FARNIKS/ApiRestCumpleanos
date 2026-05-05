@@ -37,9 +37,7 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Método Senior para verificar si es administrador rápidamente.
-     */
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

@@ -12,6 +12,7 @@ class Employee extends Model
     protected $connection = 'sqlsrvax';
 
     protected $table = 'AX_Usuarios_Cumple';*/
+
     protected $table = 'employees';
     public $timestamps = false;
 
