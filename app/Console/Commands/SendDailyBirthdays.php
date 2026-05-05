@@ -15,15 +15,11 @@ class SendDailyBirthdays extends Command
     protected $signature = 'app:send-daily-birthdays';
     protected $description = 'Procesa y envía los correos de cumpleaños y frases diarias de OBGROUP';
 
-    /**
-     * Ejecuta la lógica del comando.
-     */
     public function handle(BirthdayService $service)
     {
-        // 1. Obtener datos procesados del servicio
+
         $data = $service->getProcessedBirthdays();
 
-        // --- CASO A: ERROR DE INTEGRIDAD (Quórum < 550) ---
         if (is_null($data)) {
             $recipients = ['jquesada@corporacionob.com', 'mjimenezf@elorbe.la'];
 
@@ -36,7 +32,6 @@ class SendDailyBirthdays extends Command
             return;
         }
 
-        // --- DESTINATARIOS DE PRODUCCIÓN ---
         $mainRecipient = 'talentohumanocentroa@corporacionob.com';
 
         $bccList = [
@@ -55,16 +50,13 @@ class SendDailyBirthdays extends Command
             'todoelpersonalcentroamerica@corporacionob.com'
         ];
 
-        // --- CASO B: HAY CUMPLEAÑEROS ---
         if ($data['birthdays']->isNotEmpty()) {
             Mail::to($mainRecipient)
                 ->bcc($bccList)
                 ->send(new BirthdayMail($data));
 
             $this->info('Correos de felicitación enviados masivamente.');
-        }
-        // --- CASO C: DÍA SIN CUMPLEAÑOS ---
-        else {
+        } else {
             Mail::to($mainRecipient)
                 ->bcc($bccList)
                 ->send(new NoBirthdaysMail($data));
@@ -72,7 +64,6 @@ class SendDailyBirthdays extends Command
             $this->info('Correo de día sin cumpleaños enviado.');
         }
 
-        // --- PASO 4: REPORTE DE AUDITORÍA ---
         $this->processAuditReport($service);
     }
 
